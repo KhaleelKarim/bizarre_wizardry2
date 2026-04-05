@@ -1,7 +1,7 @@
 package dev.ragu_rakkoon.bizarre_wizardry2.registry;
 
 import dev.ragu_rakkoon.bizarre_wizardry2.BizarreWizardry2;
-import dev.ragu_rakkoon.bizarre_wizardry2.item.ZankpakutoItem;
+import dev.ragu_rakkoon.bizarre_wizardry2.item.ZanpakutoItem;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
@@ -14,7 +14,9 @@ public class ModItems {
     public static final DeferredItem<Item> EXAMPLE_ITEM = ITEMS.registerSimpleItem("example_item", p -> p.food(new FoodProperties.Builder()
             .alwaysEdible().nutrition(1).saturationModifier(2f).build()));
 
-    public static final DeferredItem<ZankpakutoItem> ZANKPAKUTO = ITEMS.register("zankpakuto", () -> new ZankpakutoItem(new Item.Properties()));
+    public static final DeferredItem<ZanpakutoItem> ZANPAKUTO = ITEMS.registerItem(
+            "zanpakuto",
+            p -> new ZanpakutoItem(p.attributes(ZanpakutoItem.createAttributes(5.0f, -2.4f))));
 
     public static void register(IEventBus modEventBus) {
         ITEMS.register(modEventBus);

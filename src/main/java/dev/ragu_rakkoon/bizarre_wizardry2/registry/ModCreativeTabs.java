@@ -12,12 +12,12 @@ import net.minecraft.core.registries.Registries;
 public class ModCreativeTabs {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, BizarreWizardry2.MOD_ID);
 
-    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
-            .title(Component.translatable("itemGroup.examplemod"))
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> BIZARRE_WIZARDRY_TAB = CREATIVE_MODE_TABS.register("bizarre_wizardry_tab", () -> CreativeModeTab.builder()
+            .title(Component.translatable("itemGroup.bizarre_wizardry2_jak.bizarre_wizardry2"))
             .withTabsBefore(CreativeModeTabs.COMBAT)
-            .icon(() -> ModItems.EXAMPLE_ITEM.get().getDefaultInstance())
+            .icon(() -> ModItems.ZANPAKUTO.get().getDefaultInstance())
             .displayItems((parameters, output) -> {
-                output.accept(ModItems.EXAMPLE_ITEM.get());
+                output.accept(ModItems.ZANPAKUTO.get());
             }).build());
 
     public static void register(IEventBus modEventBus) {
