@@ -21,7 +21,7 @@ public class ModItems {
             "zanpakuto",
             p -> new ZanpakutoItem(p
                     .attributes(ZanpakutoItem.createAttributes(5.0f, -2.4f))
-                    .component(ModDataComponents.ZANPAKUTO_SPELL_DATA.get(), new ZanpakutoSpellData(List.of(), 0))));
+                    .component(ModDataComponents.ZANPAKUTO_SPELL_DATA.get(), new ZanpakutoSpellData(List.of(ModSpells.FIREBALL), 0))));
 
     public static void register(IEventBus modEventBus) {
         ITEMS.register(modEventBus);
