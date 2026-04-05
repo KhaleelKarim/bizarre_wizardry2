@@ -3,6 +3,7 @@ package dev.ragu_rakkoon.bizarre_wizardry2;
 import dev.ragu_rakkoon.bizarre_wizardry2.registry.ModBlocks;
 import dev.ragu_rakkoon.bizarre_wizardry2.registry.ModCreativeTabs;
 import dev.ragu_rakkoon.bizarre_wizardry2.registry.ModItems;
+import dev.ragu_rakkoon.bizarre_wizardry2.registry.ModSpells;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -31,6 +32,7 @@ public class BizarreWizardry2 {
         ModBlocks.register(modEventBus);
         ModItems.register(modEventBus);
         ModCreativeTabs.register(modEventBus);
+        ModSpells.register(modEventBus);
 
         NeoForge.EVENT_BUS.register(this);
 
