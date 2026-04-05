@@ -1,4 +1,10 @@
 {
   "item.bizarre_wizardry2_jak.zanpakuto": "Zanpakuto",
-  "itemGroup.bizarre_wizardry2_jak.bizarre_wizardry2": "Bizarre Wizardry 2"
+
+
+  "itemGroup.bizarre_wizardry2_jak.bizarre_wizardry2": "Bizarre Wizardry 2",
+
+
+  "spell.bizarre_wizardry2_jak.fireball": "Fireball",
+  "spell.bizarre_wizardry2_jak.stomp": "Stomp"
 }

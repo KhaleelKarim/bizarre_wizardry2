@@ -3,6 +3,7 @@ package dev.ragu_rakkoon.bizarre_wizardry2.registry;
 import dev.ragu_rakkoon.bizarre_wizardry2.BizarreWizardry2;
 import dev.ragu_rakkoon.bizarre_wizardry2.spell.FireballSpell;
 import dev.ragu_rakkoon.bizarre_wizardry2.spell.Spell;
+import dev.ragu_rakkoon.bizarre_wizardry2.spell.StompSpell;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
@@ -24,6 +25,8 @@ public class ModSpells {
     public static final DeferredRegister<Spell> SPELLS = DeferredRegister.create(SPELL_REGISTRY, BizarreWizardry2.MOD_ID);
 
     public static final DeferredHolder<Spell, Spell> FIREBALL = SPELLS.register("fireball", FireballSpell::new);
+
+    public static final DeferredHolder<Spell, Spell> STOMP = SPELLS.register("stomp", StompSpell::new);
 
     public static void register(IEventBus modEventBus) {
         modEventBus.addListener(ModSpells::registerRegistries);
