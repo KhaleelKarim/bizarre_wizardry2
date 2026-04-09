@@ -1,5 +1,6 @@
 package dev.ragu_rakkoon.bizarre_wizardry2;
 
+import dev.ragu_rakkoon.bizarre_wizardry2.network.CycleSpellPayload;
 import dev.ragu_rakkoon.bizarre_wizardry2.registry.ModBlocks;
 import dev.ragu_rakkoon.bizarre_wizardry2.registry.ModCreativeTabs;
 import dev.ragu_rakkoon.bizarre_wizardry2.registry.ModDataComponents;
@@ -21,6 +22,8 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 @Mod(BizarreWizardry2.MOD_ID)
 public class BizarreWizardry2 {
@@ -29,6 +32,7 @@ public class BizarreWizardry2 {
 
     public BizarreWizardry2(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(this::commonSetup);
+        modEventBus.addListener(this::registerPayloads);
 
         ModBlocks.register(modEventBus);
         ModItems.register(modEventBus);
@@ -59,6 +63,11 @@ public class BizarreWizardry2 {
         if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
             event.accept(ModBlocks.EXAMPLE_BLOCK_ITEM);
         }
+    }
+
+    private void registerPayloads(RegisterPayloadHandlersEvent event) {
+        PayloadRegistrar registrar = event.registrar("1");
+        registrar.playToServer(CycleSpellPayload.TYPE, CycleSpellPayload.STREAM_CODEC, CycleSpellPayload::handle);
     }
 
     @SubscribeEvent

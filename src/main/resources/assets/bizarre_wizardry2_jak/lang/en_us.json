@@ -6,5 +6,10 @@
 
 
   "spell.bizarre_wizardry2_jak.fireball": "Fireball",
-  "spell.bizarre_wizardry2_jak.stomp": "Stomp"
+  "spell.bizarre_wizardry2_jak.stomp": "Stomp",
+  "spell.bizarre_wizardry2_jak.dash": "Dash",
+
+  "key.bizarre_wizardry2_jak.cycle_spell": "Cycle Spell",
+  "key.categories.bizarre_wizardry2_jak.bizarre_wizardry2": "Bizarre Wizardry 2",
+  "message.bizarre_wizardry2_jak.spell_switched": "Spell: %s"
 }

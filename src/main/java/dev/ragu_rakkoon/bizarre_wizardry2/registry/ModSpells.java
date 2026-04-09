@@ -1,6 +1,7 @@
 package dev.ragu_rakkoon.bizarre_wizardry2.registry;
 
 import dev.ragu_rakkoon.bizarre_wizardry2.BizarreWizardry2;
+import dev.ragu_rakkoon.bizarre_wizardry2.spell.DashSpell;
 import dev.ragu_rakkoon.bizarre_wizardry2.spell.FireballSpell;
 import dev.ragu_rakkoon.bizarre_wizardry2.spell.Spell;
 import dev.ragu_rakkoon.bizarre_wizardry2.spell.StompSpell;
@@ -27,6 +28,8 @@ public class ModSpells {
     public static final DeferredHolder<Spell, Spell> FIREBALL = SPELLS.register("fireball", FireballSpell::new);
 
     public static final DeferredHolder<Spell, Spell> STOMP = SPELLS.register("stomp", StompSpell::new);
+
+    public static final DeferredHolder<Spell, Spell> DASH = SPELLS.register("dash", DashSpell::new);
 
     public static void register(IEventBus modEventBus) {
         modEventBus.addListener(ModSpells::registerRegistries);
