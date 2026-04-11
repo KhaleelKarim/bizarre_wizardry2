@@ -17,7 +17,8 @@ public class DashSpell extends Spell {
         if (!level.isClientSide()) {
             Vec3 look = player.getLookAngle();
             double dashStrength = 1.5;
-            player.push(look.x * dashStrength, 0.2, look.z * dashStrength);
+            player.push(look.scale(dashStrength));
+            player.hurtMarked = true;
         }
     }
 }
