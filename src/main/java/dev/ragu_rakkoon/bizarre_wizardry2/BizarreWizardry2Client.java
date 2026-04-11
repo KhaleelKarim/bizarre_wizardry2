@@ -19,11 +19,11 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 
 @Mod(value = BizarreWizardry2.MOD_ID, dist = Dist.CLIENT)
 @EventBusSubscriber(modid = BizarreWizardry2.MOD_ID, value = Dist.CLIENT)
-public class ExampleModClient {
-    public ExampleModClient(IEventBus modEventBus, ModContainer container) {
+public class BizarreWizardry2Client {
+    public BizarreWizardry2Client(IEventBus modEventBus, ModContainer container) {
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         modEventBus.addListener(this::registerKeybinds);
-        NeoForge.EVENT_BUS.addListener(ExampleModClient::onClientTick);
+        NeoForge.EVENT_BUS.addListener(BizarreWizardry2Client::onClientTick);
     }
 
     private void registerKeybinds(RegisterKeyMappingsEvent event) {

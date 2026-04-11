@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "I": "minecraft:iron_sword",
+    "L": "minecraft:lapis_lazuli"
+  },
+  "pattern": [
+    "  L",
+    " I ",
+    "L  "
+  ],
+  "result": {
+    "count": 1,
+    "id": "bizarre_wizardry2_jak:zanpakuto"
+  }
+}

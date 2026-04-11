@@ -18,6 +18,7 @@ public class ModCreativeTabs {
             .icon(() -> ModItems.ZANPAKUTO.get().getDefaultInstance())
             .displayItems((parameters, output) -> {
                 output.accept(ModItems.ZANPAKUTO.get());
+                output.accept(ModItems.BIZARRE_BOOK.get());
             }).build());
 
     public static void register(IEventBus modEventBus) {

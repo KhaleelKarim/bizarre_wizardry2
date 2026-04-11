@@ -1,6 +1,7 @@
 package dev.ragu_rakkoon.bizarre_wizardry2.registry;
 
 import dev.ragu_rakkoon.bizarre_wizardry2.BizarreWizardry2;
+import dev.ragu_rakkoon.bizarre_wizardry2.item.BizarreBookItem;
 import dev.ragu_rakkoon.bizarre_wizardry2.item.ZanpakutoItem;
 import dev.ragu_rakkoon.bizarre_wizardry2.item.ZanpakutoSpellData;
 import net.minecraft.world.food.FoodProperties;
@@ -23,6 +24,9 @@ public class ModItems {
                     .attributes(ZanpakutoItem.createAttributes(5.0f, -2.4f))
                     .component(ModDataComponents.ZANPAKUTO_SPELL_DATA.get(), new ZanpakutoSpellData(List.of(ModSpells.FIREBALL, ModSpells.STOMP, ModSpells.DASH), 2))
                     .stacksTo(1)));
+
+    public static final DeferredItem<BizarreBookItem> BIZARRE_BOOK = ITEMS.registerItem("bizarre_book",
+            p -> new BizarreBookItem(p.stacksTo(1)));
 
     public static void register(IEventBus modEventBus) {
         ITEMS.register(modEventBus);
