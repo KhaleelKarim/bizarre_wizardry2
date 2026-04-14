@@ -1,10 +1,10 @@
 package dev.ragu_rakkoon.bizarre_wizardry2;
 
+import dev.ragu_rakkoon.bizarre_wizardry2.data.UnlockedSpellsData;
 import dev.ragu_rakkoon.bizarre_wizardry2.network.CycleSpellPayload;
-import dev.ragu_rakkoon.bizarre_wizardry2.registry.ModBlocks;
-import dev.ragu_rakkoon.bizarre_wizardry2.registry.ModCreativeTabs;
-import dev.ragu_rakkoon.bizarre_wizardry2.registry.ModDataComponents;
-import dev.ragu_rakkoon.bizarre_wizardry2.registry.ModItems;
+import dev.ragu_rakkoon.bizarre_wizardry2.network.SyncUnlockedSpellsPayload;
+import dev.ragu_rakkoon.bizarre_wizardry2.network.UnlockSpellPayload;
+import dev.ragu_rakkoon.bizarre_wizardry2.registry.*;
 import dev.ragu_rakkoon.bizarre_wizardry2.registry.ModSpells;
 import org.slf4j.Logger;
 
@@ -21,9 +21,11 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
-import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
 @Mod(BizarreWizardry2.MOD_ID)
 public class BizarreWizardry2 {
@@ -39,6 +41,7 @@ public class BizarreWizardry2 {
         ModCreativeTabs.register(modEventBus);
         ModSpells.register(modEventBus);
         ModDataComponents.register(modEventBus);
+        ModAttachments.register(modEventBus);
 
         NeoForge.EVENT_BUS.register(this);
 
@@ -68,9 +71,27 @@ public class BizarreWizardry2 {
     private void registerPayloads(RegisterPayloadHandlersEvent event) {
         PayloadRegistrar registrar = event.registrar("1");
         registrar.playToServer(CycleSpellPayload.TYPE, CycleSpellPayload.STREAM_CODEC, CycleSpellPayload::handle);
+        registrar.playToServer(UnlockSpellPayload.TYPE, UnlockSpellPayload.STREAM_CODEC, UnlockSpellPayload::handle);
+        registrar.playToClient(SyncUnlockedSpellsPayload.TYPE, SyncUnlockedSpellsPayload.STREAM_CODEC, SyncUnlockedSpellsPayload::handle);
     }
 
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
+    }
+
+    @SubscribeEvent
+    public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+            // Ensure fireball is always unlocked by default
+            UnlockedSpellsData data = serverPlayer.getData(ModAttachments.UNLOCKED_SPELLS.get());
+            net.minecraft.resources.Identifier fireballId =
+                    ModSpells.SPELL_REGISTRY.getKey(ModSpells.FIREBALL.value());
+            if (!data.isUnlocked(fireballId)) {
+                data.unlock(fireballId);
+                serverPlayer.setData(ModAttachments.UNLOCKED_SPELLS.get(), data);
+            }
+            // Sync to client
+            PacketDistributor.sendToPlayer(serverPlayer, SyncUnlockedSpellsPayload.from(data));
+        }
     }
 }

@@ -33,8 +33,11 @@ public record CycleSpellPayload() implements CustomPacketPayload {
             return;
         }
 
+        // Sync spell list from player's unlocked spells before cycling
+        ZanpakutoItem.syncSpellList(stack, player);
+
         ZanpakutoSpellData data = stack.get(ModDataComponents.ZANPAKUTO_SPELL_DATA.get());
-        if (data == null || data.spells().isEmpty()) {
+        if (data == null || data.spells().size() <= 1) {
             return;
         }
 

@@ -1,6 +1,7 @@
 package dev.ragu_rakkoon.bizarre_wizardry2.client.screen;
 
 import dev.ragu_rakkoon.bizarre_wizardry2.spell.Spell;
+import dev.ragu_rakkoon.bizarre_wizardry2.spell.SpellUnlockCondition;
 import net.minecraft.core.Holder;
 
 import java.util.List;
@@ -10,14 +11,14 @@ public class SpellTreeNode {
     private final int x;
     private final int y;
     private final List<SpellTreeNode> prerequisites;
-    private boolean unlocked;
+    private final SpellUnlockCondition condition;
 
-    public SpellTreeNode(Holder<Spell> spell, int x, int y, List<SpellTreeNode> prerequisites, boolean unlocked) {
+    public SpellTreeNode(Holder<Spell> spell, int x, int y, List<SpellTreeNode> prerequisites, SpellUnlockCondition condition) {
         this.spell = spell;
         this.x = x;
         this.y = y;
         this.prerequisites = prerequisites;
-        this.unlocked = unlocked;
+        this.condition = condition;
     }
 
     public Holder<Spell> getSpell() {
@@ -36,11 +37,7 @@ public class SpellTreeNode {
         return prerequisites;
     }
 
-    public boolean isUnlocked() {
-        return unlocked;
-    }
-
-    public void setUnlocked(boolean unlocked) {
-        this.unlocked = unlocked;
+    public SpellUnlockCondition getCondition() {
+        return condition;
     }
 }

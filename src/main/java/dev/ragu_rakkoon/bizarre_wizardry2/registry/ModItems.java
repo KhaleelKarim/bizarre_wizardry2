@@ -22,7 +22,7 @@ public class ModItems {
             "zanpakuto",
             p -> new ZanpakutoItem(p
                     .attributes(ZanpakutoItem.createAttributes(5.0f, -2.4f))
-                    .component(ModDataComponents.ZANPAKUTO_SPELL_DATA.get(), new ZanpakutoSpellData(List.of(ModSpells.FIREBALL, ModSpells.STOMP, ModSpells.DASH), 2))
+                    .component(ModDataComponents.ZANPAKUTO_SPELL_DATA.get(), new ZanpakutoSpellData(List.of(ModSpells.FIREBALL), 0))
                     .stacksTo(1)));
 
     public static final DeferredItem<BizarreBookItem> BIZARRE_BOOK = ITEMS.registerItem("bizarre_book",
