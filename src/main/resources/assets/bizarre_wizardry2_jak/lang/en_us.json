@@ -12,5 +12,7 @@
 
   "key.bizarre_wizardry2_jak.cycle_spell": "Cycle Spell",
   "key.categories.bizarre_wizardry2_jak.bizarre_wizardry2": "Bizarre Wizardry 2",
-  "message.bizarre_wizardry2_jak.spell_switched": "Spell: %s"
+  "message.bizarre_wizardry2_jak.spell_switched": "Spell: %s",
+
+  "screen.bizarre_wizardry2_jak.spell_tree": "Bizarre Wizardry 2"
 }
