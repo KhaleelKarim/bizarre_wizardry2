@@ -39,7 +39,7 @@ public record SyncUnlockedSpellsPayload(Set<Identifier> unlockedSpells) implemen
         return TYPE;
     }
 
-    public static SyncUnlockedSpellsPayload from(UnlockedSpellsData data) {
+    public static SyncUnlockedSpellsPayload from (UnlockedSpellsData data) {
         return new SyncUnlockedSpellsPayload(data.getUnlockedSpells());
     }
 

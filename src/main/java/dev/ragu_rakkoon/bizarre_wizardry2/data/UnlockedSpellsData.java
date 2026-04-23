@@ -1,6 +1,5 @@
 package dev.ragu_rakkoon.bizarre_wizardry2.data;
 
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.resources.Identifier;
 

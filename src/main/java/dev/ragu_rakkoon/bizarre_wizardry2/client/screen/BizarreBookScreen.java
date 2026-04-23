@@ -7,6 +7,7 @@ import dev.ragu_rakkoon.bizarre_wizardry2.spell.SpellUnlockCondition;
 import dev.ragu_rakkoon.bizarre_wizardry2.spell.SpellUnlockConditions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
@@ -22,6 +23,9 @@ public class BizarreBookScreen extends Screen {
     private static final int NODE_HEIGHT = 30;
     private static final int EDGE_THICKNESS = 2;
     private static final int MARGIN = 20;
+    private static final int SIDEBAR_WIDTH = 80;
+    private static final int SIDEBAR_BUTTON_HEIGHT = 20;
+    private static final int SIDEBAR_PADDING = 4;
 
     // Unlocked (green)
     private static final int COLOR_NODE_UNLOCKED = 0xFF336633;
@@ -44,6 +48,9 @@ public class BizarreBookScreen extends Screen {
     private boolean isDragging;
     private double mouseDownX;
     private double mouseDownY;
+    private Tab activeTab = Tab.SPELL_TREE;
+    private Button spellTreeButton;
+    private Button spellLoadoutButton;
 
     public BizarreBookScreen() {
         super(Component.translatable("screen.bizarre_wizardry2_jak.spell_tree"));
@@ -53,8 +60,30 @@ public class BizarreBookScreen extends Screen {
     @Override
     protected void init() {
         super.init();
-        panX = (width / 2.0) - (NODE_WIDTH / 2.0);
+        panX = SIDEBAR_WIDTH + ((width - SIDEBAR_WIDTH) / 2.0) - (NODE_WIDTH / 2.0);
         panY = (height / 2.0) - 40;
+
+        spellTreeButton = addRenderableWidget(Button.builder(
+                Component.literal("Spell Tree"), btn -> setActiveTab(Tab.SPELL_TREE))
+                .bounds(SIDEBAR_PADDING, 20, SIDEBAR_WIDTH - SIDEBAR_PADDING * 2, SIDEBAR_BUTTON_HEIGHT)
+                .build());
+
+        spellLoadoutButton = addRenderableWidget(Button.builder(
+                Component.literal("Spell Loadout"), btn -> setActiveTab(Tab.SPELL_LOADOUT))
+                .bounds(SIDEBAR_PADDING, 20 + SIDEBAR_BUTTON_HEIGHT + SIDEBAR_PADDING, SIDEBAR_WIDTH - SIDEBAR_PADDING * 2, SIDEBAR_BUTTON_HEIGHT)
+                .build());
+
+        updateButtonStates();
+    }
+
+    private void setActiveTab(Tab tab) {
+        this.activeTab = tab;
+        updateButtonStates();
+    }
+
+    private void updateButtonStates() {
+        spellTreeButton.active = activeTab != Tab.SPELL_TREE;
+        spellLoadoutButton.active = activeTab != Tab.SPELL_LOADOUT;
     }
 
     private Identifier spellId(SpellTreeNode node) {
@@ -106,89 +135,103 @@ public class BizarreBookScreen extends Screen {
         // Title
         FormattedCharSequence titleOrdered = this.getTitle().getVisualOrderText();
         int titleWidth = font.width(titleOrdered);
-        graphics.text(font, titleOrdered, width / 2 - titleWidth / 2, 6, COLOR_TEXT);
+        graphics.text(font, titleOrdered, SIDEBAR_WIDTH + (width - SIDEBAR_WIDTH) / 2 - titleWidth / 2, 6, COLOR_TEXT);
 
-        graphics.enableScissor(MARGIN, MARGIN, width - MARGIN, height - MARGIN);
+        int contentLeft = SIDEBAR_WIDTH + MARGIN;
 
-        // Edges
-        for (SpellTreeNode node : treeData.getNodes()) {
-            int nodeScreenX = (int) panX + node.getX() + NODE_WIDTH / 2;
-            int nodeScreenY = (int) panY + node.getY();
-            for (SpellTreeNode prereq : node.getPrerequisites()) {
-                int prereqScreenX = (int) panX + prereq.getX() + NODE_WIDTH / 2;
-                int prereqScreenY = (int) panY + prereq.getY() + NODE_HEIGHT;
-                graphics.fill(
-                        prereqScreenX - EDGE_THICKNESS / 2, prereqScreenY,
-                        prereqScreenX + EDGE_THICKNESS / 2, nodeScreenY,
-                        COLOR_EDGE);
+        if (activeTab == Tab.SPELL_TREE) {
+            graphics.enableScissor(contentLeft, MARGIN, width - MARGIN, height - MARGIN);
+
+            // Edges
+            for (SpellTreeNode node : treeData.getNodes()) {
+                int nodeScreenX = (int) panX + node.getX() + NODE_WIDTH / 2;
+                int nodeScreenY = (int) panY + node.getY();
+                for (SpellTreeNode prereq : node.getPrerequisites()) {
+                    int prereqScreenX = (int) panX + prereq.getX() + NODE_WIDTH / 2;
+                    int prereqScreenY = (int) panY + prereq.getY() + NODE_HEIGHT;
+                    graphics.fill(
+                            prereqScreenX - EDGE_THICKNESS / 2, prereqScreenY,
+                            prereqScreenX + EDGE_THICKNESS / 2, nodeScreenY,
+                            COLOR_EDGE);
+                }
             }
-        }
 
-        // Nodes
-        SpellTreeNode hoveredNode = null;
-        NodeState hoveredState = NodeState.LOCKED;
-        for (SpellTreeNode node : treeData.getNodes()) {
-            int screenX = (int) panX + node.getX();
-            int screenY = (int) panY + node.getY();
-            NodeState state = getNodeState(node);
+            // Nodes
+            SpellTreeNode hoveredNode = null;
+            NodeState hoveredState = NodeState.LOCKED;
+            for (SpellTreeNode node : treeData.getNodes()) {
+                int screenX = (int) panX + node.getX();
+                int screenY = (int) panY + node.getY();
+                NodeState state = getNodeState(node);
 
-            int bgColor = switch (state) {
-                case UNLOCKED -> COLOR_NODE_UNLOCKED;
-                case AVAILABLE -> COLOR_NODE_AVAILABLE;
-                case LOCKED -> COLOR_NODE_LOCKED;
-            };
-            int borderColor = switch (state) {
-                case UNLOCKED -> COLOR_NODE_BORDER_UNLOCKED;
-                case AVAILABLE -> COLOR_NODE_BORDER_AVAILABLE;
-                case LOCKED -> COLOR_NODE_BORDER_LOCKED;
-            };
+                int bgColor = switch (state) {
+                    case UNLOCKED -> COLOR_NODE_UNLOCKED;
+                    case AVAILABLE -> COLOR_NODE_AVAILABLE;
+                    case LOCKED -> COLOR_NODE_LOCKED;
+                };
+                int borderColor = switch (state) {
+                    case UNLOCKED -> COLOR_NODE_BORDER_UNLOCKED;
+                    case AVAILABLE -> COLOR_NODE_BORDER_AVAILABLE;
+                    case LOCKED -> COLOR_NODE_BORDER_LOCKED;
+                };
 
-            graphics.fill(screenX - 1, screenY - 1, screenX + NODE_WIDTH + 1, screenY + NODE_HEIGHT + 1, borderColor);
-            graphics.fill(screenX, screenY, screenX + NODE_WIDTH, screenY + NODE_HEIGHT, bgColor);
+                graphics.fill(screenX - 1, screenY - 1, screenX + NODE_WIDTH + 1, screenY + NODE_HEIGHT + 1, borderColor);
+                graphics.fill(screenX, screenY, screenX + NODE_WIDTH, screenY + NODE_HEIGHT, bgColor);
 
-            String spellName = Component.translatable(node.getSpell().value().getTranslationKey()).getString();
-            int textWidth = font.width(spellName);
-            graphics.text(font, spellName,
-                    screenX + NODE_WIDTH / 2 - textWidth / 2,
-                    screenY + (NODE_HEIGHT - 8) / 2,
+                String spellName = Component.translatable(node.getSpell().value().getTranslationKey()).getString();
+                int textWidth = font.width(spellName);
+                graphics.text(font, spellName,
+                        screenX + NODE_WIDTH / 2 - textWidth / 2,
+                        screenY + (NODE_HEIGHT - 8) / 2,
+                        COLOR_TEXT);
+
+                if (mouseX >= screenX && mouseX < screenX + NODE_WIDTH
+                        && mouseY >= screenY && mouseY < screenY + NODE_HEIGHT) {
+                    hoveredNode = node;
+                    hoveredState = state;
+                }
+            }
+
+            graphics.disableScissor();
+
+            // Tooltip
+            if (hoveredNode != null) {
+                String tooltip = getTooltip(hoveredNode, hoveredState);
+                if (!tooltip.isEmpty()) {
+                    int tw = font.width(tooltip);
+                    int tx = Math.min(mouseX + 6, width - tw - 4);
+                    int ty = mouseY - 14;
+                    graphics.fill(tx - 2, ty - 2, tx + tw + 2, ty + 10, COLOR_TOOLTIP_BG);
+                    graphics.text(font, tooltip, tx, ty, COLOR_TOOLTIP_TEXT);
+                }
+            }
+        } else if (activeTab == Tab.SPELL_LOADOUT) {
+            String placeholder = "Spell Loadout - Coming Soon";
+            int tw = font.width(placeholder);
+            graphics.text(font, placeholder,
+                    contentLeft + (width - contentLeft - MARGIN) / 2 - tw / 2,
+                    height / 2,
                     COLOR_TEXT);
-
-            if (mouseX >= screenX && mouseX < screenX + NODE_WIDTH
-                    && mouseY >= screenY && mouseY < screenY + NODE_HEIGHT) {
-                hoveredNode = node;
-                hoveredState = state;
-            }
-        }
-
-        graphics.disableScissor();
-
-        // Tooltip
-        if (hoveredNode != null) {
-            String tooltip = getTooltip(hoveredNode, hoveredState);
-            if (!tooltip.isEmpty()) {
-                int tw = font.width(tooltip);
-                int tx = Math.min(mouseX + 6, width - tw - 4);
-                int ty = mouseY - 14;
-                graphics.fill(tx - 2, ty - 2, tx + tw + 2, ty + 10, COLOR_TOOLTIP_BG);
-                graphics.text(font, tooltip, tx, ty, COLOR_TOOLTIP_TEXT);
-            }
         }
     }
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        if (event.button() == 0) {
+        if (super.mouseClicked(event, doubleClick)) {
+            return true;
+        }
+        if (activeTab == Tab.SPELL_TREE && event.button() == 0) {
             mouseDownX = event.x();
             mouseDownY = event.y();
             isDragging = true;
             return true;
         }
-        return super.mouseClicked(event, doubleClick);
+        return false;
     }
 
     @Override
     public boolean mouseReleased(MouseButtonEvent event) {
-        if (event.button() == 0) {
+        if (activeTab == Tab.SPELL_TREE && event.button() == 0) {
             isDragging = false;
             double dx = event.x() - mouseDownX;
             double dy = event.y() - mouseDownY;
@@ -220,7 +263,7 @@ public class BizarreBookScreen extends Screen {
 
     @Override
     public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
-        if (isDragging && event.button() == 0) {
+        if (activeTab == Tab.SPELL_TREE && isDragging && event.button() == 0) {
             panX += dx;
             panY += dy;
             return true;
@@ -235,5 +278,9 @@ public class BizarreBookScreen extends Screen {
 
     private enum NodeState {
         UNLOCKED, AVAILABLE, LOCKED
+    }
+
+    private enum Tab {
+        SPELL_TREE, SPELL_LOADOUT
     }
 }
