@@ -3,11 +3,9 @@ package dev.ragu_rakkoon.bizarre_wizardry2.registry;
 import dev.ragu_rakkoon.bizarre_wizardry2.BizarreWizardry2;
 import dev.ragu_rakkoon.bizarre_wizardry2.item.BizarreBookItem;
 import dev.ragu_rakkoon.bizarre_wizardry2.item.ZanpakutoItem;
-import dev.ragu_rakkoon.bizarre_wizardry2.item.ZanpakutoSpellData;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 
-import java.util.List;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -22,7 +20,6 @@ public class ModItems {
             "zanpakuto",
             p -> new ZanpakutoItem(p
                     .attributes(ZanpakutoItem.createAttributes(5.0f, -2.4f))
-                    .component(ModDataComponents.ZANPAKUTO_SPELL_DATA.get(), new ZanpakutoSpellData(List.of(ModSpells.FIREBALL), 0))
                     .stacksTo(1)));
 
     public static final DeferredItem<BizarreBookItem> BIZARRE_BOOK = ITEMS.registerItem("bizarre_book",

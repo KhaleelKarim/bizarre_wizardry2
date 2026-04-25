@@ -19,24 +19,28 @@ public class EquippedSpellsData {
     public static final MapCodec<EquippedSpellsData> CODEC = RecordCodecBuilder.mapCodec(instance ->
             instance.group(
                     Codec.INT.fieldOf("max_slots").forGetter(d -> d.maxSlots),
-                    Identifier.CODEC.listOf().fieldOf("spells").forGetter(d -> d.equippedSpells)
+                    Identifier.CODEC.listOf().fieldOf("spells").forGetter(d -> d.equippedSpells),
+                    Codec.INT.fieldOf("selected_slot").forGetter(d -> d.selectedSlot)
             ).apply(instance, EquippedSpellsData::new)
     );
 
     private int maxSlots;
     private final ArrayList<Identifier> equippedSpells;
+    private int selectedSlot;
 
-    public EquippedSpellsData(int maxSlots, List<Identifier> spells) {
+    public EquippedSpellsData(int maxSlots, List<Identifier> spells, int selectedSlot) {
         this.maxSlots = maxSlots;
         this.equippedSpells = new ArrayList<>(spells);
         // Ensure the list is exactly maxSlots size
         while (this.equippedSpells.size() < maxSlots) this.equippedSpells.add(EMPTY);
         while (this.equippedSpells.size() > maxSlots) this.equippedSpells.remove(this.equippedSpells.size() - 1);
+        this.selectedSlot = (selectedSlot >= 0 && selectedSlot < this.maxSlots) ? selectedSlot : 0;
     }
 
     public EquippedSpellsData() {
         this.maxSlots = DEFAULT_MAX_SLOTS;
         this.equippedSpells = new ArrayList<>(Collections.nCopies(DEFAULT_MAX_SLOTS, EMPTY));
+        this.selectedSlot = 0;
     }
 
     public boolean isEquipped(Identifier spellId) {
@@ -108,5 +112,32 @@ public class EquippedSpellsData {
 
     public List<Identifier> getEquippedSpells() {
         return List.copyOf(equippedSpells);
+    }
+
+    public int getSelectedSlot() {
+        return selectedSlot;
+    }
+
+    public void setSelectedSlot(int slot) {
+        if (slot >= 0 && slot < maxSlots) selectedSlot = slot;
+    }
+
+    /** Returns the ID of the currently selected spell, or EMPTY if the slot is empty. */
+    public Identifier getSelectedSpellId() {
+        return getSpellAt(selectedSlot);
+    }
+
+    /**
+     * Advances selectedSlot to the next occupied slot (wrapping around).
+     * Does nothing if no slots are occupied.
+     */
+    public void cycleSlot() {
+        for (int i = 1; i <= maxSlots; i++) {
+            int candidate = (selectedSlot + i) % maxSlots;
+            if (!EMPTY.equals(equippedSpells.get(candidate))) {
+                selectedSlot = candidate;
+                return;
+            }
+        }
     }
 }

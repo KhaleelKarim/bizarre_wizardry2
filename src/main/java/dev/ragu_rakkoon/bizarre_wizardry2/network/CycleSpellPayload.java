@@ -1,10 +1,12 @@
 package dev.ragu_rakkoon.bizarre_wizardry2.network;
 
 import dev.ragu_rakkoon.bizarre_wizardry2.BizarreWizardry2;
-import dev.ragu_rakkoon.bizarre_wizardry2.item.ZanpakutoItem;
-import dev.ragu_rakkoon.bizarre_wizardry2.item.ZanpakutoSpellData;
-import dev.ragu_rakkoon.bizarre_wizardry2.registry.ModDataComponents;
+import dev.ragu_rakkoon.bizarre_wizardry2.data.EquippedSpellsData;
+import dev.ragu_rakkoon.bizarre_wizardry2.registry.ModAttachments;
+import dev.ragu_rakkoon.bizarre_wizardry2.registry.ModSpells;
+import dev.ragu_rakkoon.bizarre_wizardry2.spell.Spell;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -12,7 +14,6 @@ import net.minecraft.network.protocol.game.ClientboundSystemChatPacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record CycleSpellPayload() implements CustomPacketPayload {
@@ -27,27 +28,27 @@ public record CycleSpellPayload() implements CustomPacketPayload {
 
     public static void handle(CycleSpellPayload payload, IPayloadContext context) {
         Player player = context.player();
-        ItemStack stack = player.getMainHandItem();
 
-        if (!(stack.getItem() instanceof ZanpakutoItem)) {
-            return;
-        }
+        EquippedSpellsData equipData = player.getData(ModAttachments.EQUIPPED_SPELLS.get());
 
-        // Sync spell list from player's unlocked spells before cycling
-        ZanpakutoItem.syncSpellList(stack, player);
+        // Nothing to cycle if all slots are empty
+        boolean anyOccupied = equipData.getEquippedSpells().stream()
+                .anyMatch(id -> !EquippedSpellsData.EMPTY.equals(id));
+        if (!anyOccupied) return;
 
-        ZanpakutoSpellData data = stack.get(ModDataComponents.ZANPAKUTO_SPELL_DATA.get());
-        if (data == null || data.spells().size() <= 1) {
-            return;
-        }
+        equipData.cycleSlot();
+        player.setData(ModAttachments.EQUIPPED_SPELLS.get(), equipData);
 
-        int newIndex = (data.selectedIndex() + 1) % data.spells().size();
-        stack.set(ModDataComponents.ZANPAKUTO_SPELL_DATA.get(), data.withSelectedIndex(newIndex));
+        // Notify the client of the new selected slot
+        context.reply(SyncEquippedSpellsPayload.from(equipData));
 
-        String spellName = data.spells().get(newIndex).value().getTranslationKey();
-        if (player instanceof ServerPlayer serverPlayer) {
+        // Show the newly selected spell name in the action bar
+        Identifier newId = equipData.getSelectedSpellId();
+        Spell spell = ModSpells.SPELL_REGISTRY.get(newId).map(Holder.Reference::value).orElse(null);
+        if (spell != null && player instanceof ServerPlayer serverPlayer) {
             serverPlayer.connection.send(new ClientboundSystemChatPacket(
-                    Component.translatable("message.bizarre_wizardry2_jak.spell_switched", Component.translatable(spellName)), true));
+                    Component.translatable("message.bizarre_wizardry2_jak.spell_switched",
+                            Component.translatable(spell.getTranslationKey())), true));
         }
     }
 }

@@ -12,7 +12,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 import java.util.ArrayList;
 import java.util.List;
 
-public record SyncEquippedSpellsPayload(List<Identifier> equippedSpells, int maxSlots)
+public record SyncEquippedSpellsPayload(List<Identifier> equippedSpells, int maxSlots, int selectedSlot)
         implements CustomPacketPayload {
 
     public static final Type<SyncEquippedSpellsPayload> TYPE =
@@ -24,13 +24,15 @@ public record SyncEquippedSpellsPayload(List<Identifier> equippedSpells, int max
                         buf.writeVarInt(payload.maxSlots());
                         buf.writeVarInt(payload.equippedSpells().size());
                         payload.equippedSpells().forEach(id -> buf.writeUtf(id.toString()));
+                        buf.writeVarInt(payload.selectedSlot());
                     },
                     buf -> {
                         int maxSlots = buf.readVarInt();
                         int size = buf.readVarInt();
                         List<Identifier> list = new ArrayList<>();
                         for (int i = 0; i < size; i++) list.add(EquipSpellPayload.parseIdentifier(buf.readUtf()));
-                        return new SyncEquippedSpellsPayload(list, maxSlots);
+                        int selectedSlot = buf.readVarInt();
+                        return new SyncEquippedSpellsPayload(list, maxSlots, selectedSlot);
                     }
             );
 
@@ -40,10 +42,10 @@ public record SyncEquippedSpellsPayload(List<Identifier> equippedSpells, int max
     }
 
     public static SyncEquippedSpellsPayload from(EquippedSpellsData data) {
-        return new SyncEquippedSpellsPayload(data.getEquippedSpells(), data.getMaxSlots());
+        return new SyncEquippedSpellsPayload(data.getEquippedSpells(), data.getMaxSlots(), data.getSelectedSlot());
     }
 
     public static void handle(SyncEquippedSpellsPayload payload, IPayloadContext context) {
-        ClientEquippedSpells.set(payload.equippedSpells(), payload.maxSlots());
+        ClientEquippedSpells.set(payload.equippedSpells(), payload.maxSlots(), payload.selectedSlot());
     }
 }

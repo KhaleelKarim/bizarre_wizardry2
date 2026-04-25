@@ -12,11 +12,13 @@ public class ClientEquippedSpells {
     private static int maxSlots = 3;
     private static ArrayList<Identifier> equippedSpells =
             new ArrayList<>(Collections.nCopies(maxSlots, EquippedSpellsData.EMPTY));
+    private static int selectedSlot = 0;
 
     /** Called when the server syncs the player's full equipped spells state. */
-    public static void set(List<Identifier> spells, int maxSlots) {
+    public static void set(List<Identifier> spells, int maxSlots, int selectedSlot) {
         ClientEquippedSpells.maxSlots = maxSlots;
         ClientEquippedSpells.equippedSpells = new ArrayList<>(spells);
+        ClientEquippedSpells.selectedSlot = selectedSlot;
     }
 
     public static boolean isEquipped(Identifier spellId) {
@@ -43,6 +45,15 @@ public class ClientEquippedSpells {
 
     public static int getMaxSlots() {
         return maxSlots;
+    }
+
+    public static int getSelectedSlot() {
+        return selectedSlot;
+    }
+
+    /** Returns the ID of the currently selected spell, or EMPTY if the slot is empty. */
+    public static Identifier getSelectedSpellId() {
+        return getSpellAt(selectedSlot);
     }
 
     public static List<Identifier> getAll() {
