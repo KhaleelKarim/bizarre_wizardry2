@@ -1,7 +1,10 @@
 package dev.ragu_rakkoon.bizarre_wizardry2;
 
+import dev.ragu_rakkoon.bizarre_wizardry2.data.EquippedSpellsData;
 import dev.ragu_rakkoon.bizarre_wizardry2.data.UnlockedSpellsData;
 import dev.ragu_rakkoon.bizarre_wizardry2.network.CycleSpellPayload;
+import dev.ragu_rakkoon.bizarre_wizardry2.network.EquipSpellPayload;
+import dev.ragu_rakkoon.bizarre_wizardry2.network.SyncEquippedSpellsPayload;
 import dev.ragu_rakkoon.bizarre_wizardry2.network.SyncUnlockedSpellsPayload;
 import dev.ragu_rakkoon.bizarre_wizardry2.network.UnlockSpellPayload;
 import dev.ragu_rakkoon.bizarre_wizardry2.registry.*;
@@ -72,7 +75,9 @@ public class BizarreWizardry2 {
         PayloadRegistrar registrar = event.registrar("1");
         registrar.playToServer(CycleSpellPayload.TYPE, CycleSpellPayload.STREAM_CODEC, CycleSpellPayload::handle);
         registrar.playToServer(UnlockSpellPayload.TYPE, UnlockSpellPayload.STREAM_CODEC, UnlockSpellPayload::handle);
+        registrar.playToServer(EquipSpellPayload.TYPE, EquipSpellPayload.STREAM_CODEC, EquipSpellPayload::handle);
         registrar.playToClient(SyncUnlockedSpellsPayload.TYPE, SyncUnlockedSpellsPayload.STREAM_CODEC, SyncUnlockedSpellsPayload::handle);
+        registrar.playToClient(SyncEquippedSpellsPayload.TYPE, SyncEquippedSpellsPayload.STREAM_CODEC, SyncEquippedSpellsPayload::handle);
     }
 
     @SubscribeEvent
@@ -92,6 +97,8 @@ public class BizarreWizardry2 {
             }
             // Sync to client
             PacketDistributor.sendToPlayer(serverPlayer, SyncUnlockedSpellsPayload.from(data));
+            EquippedSpellsData equipData = serverPlayer.getData(ModAttachments.EQUIPPED_SPELLS.get());
+            PacketDistributor.sendToPlayer(serverPlayer, SyncEquippedSpellsPayload.from(equipData));
         }
     }
 }

@@ -1,6 +1,7 @@
 package dev.ragu_rakkoon.bizarre_wizardry2.registry;
 
 import dev.ragu_rakkoon.bizarre_wizardry2.BizarreWizardry2;
+import dev.ragu_rakkoon.bizarre_wizardry2.data.EquippedSpellsData;
 import dev.ragu_rakkoon.bizarre_wizardry2.data.UnlockedSpellsData;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentType;
@@ -17,6 +18,13 @@ public class ModAttachments {
             ATTACHMENT_TYPES.register("unlocked_spells", () ->
                     AttachmentType.builder(() -> new UnlockedSpellsData())
                             .serialize(UnlockedSpellsData.CODEC)
+                            .copyOnDeath()
+                            .build());
+
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<EquippedSpellsData>> EQUIPPED_SPELLS =
+            ATTACHMENT_TYPES.register("equipped_spells", () ->
+                    AttachmentType.builder(() -> new EquippedSpellsData())
+                            .serialize(EquippedSpellsData.CODEC)
                             .copyOnDeath()
                             .build());
 

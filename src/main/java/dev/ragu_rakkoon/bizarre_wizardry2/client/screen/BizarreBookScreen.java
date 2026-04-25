@@ -1,6 +1,9 @@
 package dev.ragu_rakkoon.bizarre_wizardry2.client.screen;
 
+import dev.ragu_rakkoon.bizarre_wizardry2.client.ClientEquippedSpells;
 import dev.ragu_rakkoon.bizarre_wizardry2.client.ClientUnlockedSpells;
+import dev.ragu_rakkoon.bizarre_wizardry2.data.EquippedSpellsData;
+import dev.ragu_rakkoon.bizarre_wizardry2.network.EquipSpellPayload;
 import dev.ragu_rakkoon.bizarre_wizardry2.network.UnlockSpellPayload;
 import dev.ragu_rakkoon.bizarre_wizardry2.registry.ModSpells;
 import dev.ragu_rakkoon.bizarre_wizardry2.spell.Spell;
@@ -72,7 +75,7 @@ public class BizarreBookScreen extends Screen {
     private Button spellLoadoutButton;
 
     // Loadout state
-    private final Identifier[] equippedSlots = new Identifier[3];
+    private Identifier[] equippedSlots;
     private Identifier selectedSpell = null;
     private double spellListScrollOffset = 0;
     private Identifier draggedSpell = null;
@@ -101,6 +104,7 @@ public class BizarreBookScreen extends Screen {
                 .build());
 
         updateButtonStates();
+        initEquippedSlots();
     }
 
     private void setActiveTab(Tab tab) {
@@ -111,6 +115,16 @@ public class BizarreBookScreen extends Screen {
     private void updateButtonStates() {
         spellTreeButton.active = activeTab != Tab.SPELL_TREE;
         spellLoadoutButton.active = activeTab != Tab.SPELL_LOADOUT;
+    }
+
+    private void initEquippedSlots() {
+        List<Identifier> current = ClientEquippedSpells.getAll();
+        int maxSlots = ClientEquippedSpells.getMaxSlots();
+        equippedSlots = new Identifier[maxSlots];
+        for (int i = 0; i < maxSlots; i++) {
+            Identifier id = current.get(i);
+            equippedSlots[i] = EquippedSpellsData.EMPTY.equals(id) ? null : id;
+        }
     }
 
     private Identifier spellId(SpellTreeNode node) {
@@ -277,11 +291,11 @@ public class BizarreBookScreen extends Screen {
     }
 
     private void drawLoadoutEquipPanel(GuiGraphicsExtractor graphics, int px1, int py1, int px2, int py2, int mouseX, int mouseY) {
-        int totalWidth = SPELL_SLOT_SIZE * 3 + SPELL_SLOT_GAP * 2;
+        int totalWidth = SPELL_SLOT_SIZE * equippedSlots.length + SPELL_SLOT_GAP * (equippedSlots.length - 1);
         int startX = px1 + (px2 - px1) / 2 - totalWidth / 2;
         int startY = py1 + (py2 - py1) / 2 - SPELL_SLOT_SIZE / 2;
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < equippedSlots.length; i++) {
             int sx = startX + i * (SPELL_SLOT_SIZE + SPELL_SLOT_GAP);
             int sy = startY;
 
@@ -379,11 +393,11 @@ public class BizarreBookScreen extends Screen {
     }
 
     private int getHoveredSlot(int mouseX, int mouseY, int px1, int py1, int px2, int py2) {
-        int totalWidth = SPELL_SLOT_SIZE * 3 + SPELL_SLOT_GAP * 2;
+        int totalWidth = SPELL_SLOT_SIZE * equippedSlots.length + SPELL_SLOT_GAP * (equippedSlots.length - 1);
         int startX = px1 + (px2 - px1) / 2 - totalWidth / 2;
         int startY = py1 + (py2 - py1) / 2 - SPELL_SLOT_SIZE / 2;
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < equippedSlots.length; i++) {
             int sx = startX + i * (SPELL_SLOT_SIZE + SPELL_SLOT_GAP);
             if (mouseX >= sx && mouseX < sx + SPELL_SLOT_SIZE
                     && mouseY >= startY && mouseY < startY + SPELL_SLOT_SIZE) {
@@ -486,13 +500,14 @@ public class BizarreBookScreen extends Screen {
                 int slot = getHoveredSlot(mx, my, topLeftX1, topLeftY1, topLeftX2, topLeftY2);
                 if (slot >= 0) {
                     // Clear the spell from any other slot it may occupy
-                    for (int i = 0; i < 3; i++) {
+                    for (int i = 0; i < equippedSlots.length; i++) {
                         if (draggedSpell.equals(equippedSlots[i])) {
                             equippedSlots[i] = null;
                         }
                     }
                     equippedSlots[slot] = draggedSpell;
                     selectedSpell = draggedSpell;
+                    ClientPacketDistributor.sendToServer(new EquipSpellPayload(draggedSpell, slot));
                 }
             }
             draggedSpell = null;
