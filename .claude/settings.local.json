@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__ide__getDiagnostics",
+      "WebFetch(domain:docs.neoforged.net)",
+      "WebFetch(domain:github.com)",
+      "Bash(./gradlew test:*)",
+      "WebFetch(domain:repo.maven.apache.org)",
+      "WebFetch(domain:mvnrepository.com)"
+    ]
+  }
+}

@@ -10,6 +10,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Group:** `dev.ragu_rakkoon.bizarre_wizardry2`
 - **Java Version:** 25
 
+## Documentation
+
+The primary source of truth for NeoForge is **https://docs.neoforged.net/**. If you need information about NeoForge APIs, testing, registration, events, or any other modding topic that you do not have or are not fully certain about, navigate to the relevant page on this site before answering or making changes. Do not rely solely on training data for NeoForge-specific details — the API evolves quickly and outdated guidance causes real problems.
+
 ## Build Commands
 
 ```bash
